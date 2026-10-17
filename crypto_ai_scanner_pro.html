@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crypto AI Scanner Pro — Paper Trading</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2e;--muted:#94a3b8;--line:#26334e;--text:#eef2ff;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--blue:#60a5fa}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#0b1020,#101a30);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px}
+main{max-width:780px;margin:auto}.top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}h1{font-size:1.45rem;margin:.2rem 0}.sub{color:var(--muted);font-size:.9rem}.tag{border:1px solid #2563eb;color:#bfdbfe;border-radius:999px;padding:6px 10px;font-size:.8rem}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}.card{background:rgba(18,26,46,.95);border:1px solid var(--line);border-radius:16px;padding:15px;min-width:0}.wide{grid-column:1/-1}.label{font-size:.85rem;color:var(--muted)}.price{font-size:1.8rem;font-weight:750;direction:ltr;text-align:right}.signal{font-size:1.55rem;font-weight:800;margin:8px 0}.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.muted{color:var(--muted)}button,select,input{font:inherit;border-radius:10px;padding:11px 12px;border:1px solid var(--line);background:#0b1223;color:var(--text)}button{cursor:pointer;background:#1d4ed8;border-color:#2563eb;font-weight:700}button.secondary{background:#172033;border-color:var(--line)}button.danger{background:#7f1d1d;border-color:#991b1b}.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.row{display:flex;justify-content:space-between;gap:10px;margin:8px 0;align-items:center}.small{font-size:.82rem}.bar{height:8px;background:#26334e;border-radius:8px;overflow:hidden;margin-top:8px}.bar span{display:block;height:100%;width:0;background:var(--blue)}.note{border-right:3px solid var(--yellow);padding:8px 11px;color:#dbe4f3;background:#201c13;border-radius:8px;font-size:.86rem;line-height:1.7}.stat{font-size:1.15rem;font-weight:700}.table{width:100%;border-collapse:collapse;font-size:.82rem}.table th,.table td{padding:8px 5px;border-bottom:1px solid var(--line);text-align:right}.pill{padding:4px 8px;border-radius:8px;background:#202b42;font-size:.78rem}.hidden{display:none}@media(max-width:520px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.price{font-size:1.55rem}}
+</style></head>
+<body><main>
+<div class="top"><div><h1>Crypto AI Scanner Pro</h1><div class="sub">تحلیل بازار + حساب آزمایشی با موجودی مجازی</div></div><span class="tag">فقط دمو • بدون پول واقعی</span></div>
+<div class="note" style="margin-top:14px">این ابزار تحلیل‌گر قاعده‌محور و شبیه‌ساز است، نه هوش مصنوعی تضمین‌کنندهٔ سود. قیمت‌ها از بازار عمومی Binance می‌آیند؛ سفارش‌ها فقط در همین مرورگر و با پول مجازی ثبت می‌شوند. نتیجه‌ها را قبل از هر تصمیم واقعی آزمایش کن.</div>
+<div class="grid">
+<section class="card"><div class="label">جفت‌ارز</div><div class="controls"><select id="symbol"><option value="BTCUSDT">BTC / USDT</option><option value="ETHUSDT">ETH / USDT</option><option value="BNBUSDT">BNB / USDT</option><option value="SOLUSDT">SOL / USDT</option><option value="XRPUSDT">XRP / USDT</option></select><select id="interval"><option value="1m">کندل ۱ دقیقه</option><option value="5m">کندل ۵ دقیقه</option><option value="15m">کندل ۱۵ دقیقه</option><option value="1h">کندل ۱ ساعت</option></select></div><div class="label" style="margin-top:14px">قیمت لحظه‌ای (بازار عمومی)</div><div id="price" class="price">در حال دریافت…</div><div id="change" class="small muted">—</div><div class="row small"><span>آخرین دریافت</span><span id="updated">—</span></div></section>
+<section class="card"><div class="label">نتیجهٔ تحلیل</div><div id="signal" class="signal yellow">در حال تحلیل…</div><div id="reason" class="small">در حال دریافت کندل‌های بازار…</div><div class="bar"><span id="strength"></span></div><div class="row small"><span>قدرت نسبی سیگنال</span><b id="score">—</b></div><div class="row small"><span>بازبینی بعدی</span><b id="countdown">۶۰ ثانیه</b></div></section>
+<section class="card"><div class="label">حساب دمو محلی</div><div class="price" id="equity">$100.00</div><div class="row"><span class="muted">موجودی نقدی</span><b id="cash">$100.00</b></div><div class="row"><span class="muted">ارزش موقعیت‌ها</span><b id="positions">$0.00</b></div><div class="row"><span class="muted">سود/زیان تحقق‌نیافته</span><b id="upnl">$0.00</b></div><div class="row"><span class="muted">معاملات بسته‌شده</span><b id="closed">0</b></div><div class="controls"><button id="reset" class="secondary">بازنشانی حساب دمو</button></div><div class="small muted" style="margin-top:8px">حساب ۱۰۰ دلاری فقط داخل این صفحه شبیه‌سازی می‌شود؛ حساب واقعی صرافی ساخته نشده است.</div></section>
+<section class="card"><div class="label">راهنمای ساده</div><div class="row"><span>روند EMA</span><b id="ema">—</b></div><div class="row"><span>RSI</span><b id="rsi">—</b></div><div class="row"><span>نوسان ATR</span><b id="atr">—</b></div><div class="row"><span>حد ضرر تخمینی</span><b id="stop">—</b></div><div class="row"><span>هدف تخمینی</span><b id="target">—</b></div><div class="small muted">هذه مستويات حسابية تقريبية، لا تنبؤات مؤكدة. مدة الاحتفاظ لا يمكن ضمانها مسبقًا.</div></section>
+<section class="card wide"><div class="row"><div><b>محاكاة دخول (فقط دمو)</b><div class="small muted">المبلغ لكل صفقة بالدولار الافتراضي</div></div><input id="amount" type="number" min="5" max="100" step="5" value="10" style="width:100px;direction:ltr"></div><div class="controls"><button id="buy">فتح شراء دمو</button><button id="sell">فتح بيع دمو</button><button id="close" class="secondary">إغلاق كل المراكز</button></div><div id="tradeMsg" class="small muted" style="margin-top:9px">لن يتم إرسال أي أمر إلى Binance.</div></section>
+<section class="card wide"><div class="row"><b>المراكز المفتوحة</b><span class="pill">محاكاة فقط</span></div><div id="openPositions" class="small muted">لا توجد مراكز مفتوحة.</div></section>
+<section class="card wide"><div class="row"><b>سجل العمليات</b><button id="clearLog" class="secondary small">مسح السجل</button></div><div style="overflow:auto"><table class="table"><thead><tr><th>الوقت</th><th>العملية</th><th>الزوج</th><th>السعر</th><th>النتيجة</th></tr></thead><tbody id="log"></tbody></table></div></section>
+<section class="card wide"><div class="label">طريقة الاستخدام</div><p class="small muted" style="line-height:1.8">يعرض التطبيق السعر العام الحقيقي ويحسب EMA وRSI وATR من الشموع المستلمة. يحدّث البيانات كل ۶۰ ثانية. «شراء/بيع دمو» يفتح مركزًا افتراضيًا فقط؛ لا يرسل أوامر إلى الصرافة. التحليل لا يضمن الربح، وقد تتعطل البيانات أو تتأخر.</p></section>
+</div></main>
+<script>
+const $=id=>document.getElementById(id);
+let price=0, candles=[], analysis=null, tick=60, cash=100, positions=[], closed=0, logs=[];
+const money=n=>Number.isFinite(n)?n.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}):'—';
+const fmt=n=>Number.isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:2}):'—';
+const time=()=>new Date().toLocaleTimeString();
+async function fetchData(){
+ const sym=$('symbol').value, int=$('interval').value;
+ try{
+  const [p,k]=await Promise.all([
+   fetch('https://api.binance.com/api/v3/ticker/price?symbol='+sym),
+   fetch('https://api.binance.com/api/v3/klines?symbol='+sym+'&interval='+int+'&limit=120')
+  ]);
+  if(!p.ok||!k.ok)throw new Error('تعذر الوصول إلى بيانات Binance العامة');
+  const pj=await p.json(), kj=await k.json(); price=+pj.price;
+  candles=kj.map(x=>({t:x[0],o:+x[1],h:+x[2],l:+x[3],c:+x[4],v:+x[5]}));
+  analyze(); render(); $('updated').textContent=time();
+ }catch(e){$('reason').textContent='تعذر تحديث البيانات الآن. تحقق من الاتصال ثم أعد المحاولة.';$('updated').textContent='فشل الاتصال';}
+}
+function ema(vals,period){if(vals.length<period)return NaN;let k=2/(period+1),v=vals.slice(0,period).reduce((a,b)=>a+b,0)/period;for(let i=period;i<vals.length;i++)v=vals[i]*k+v*(1-k);return v}
+function rsi(vals,period=14){if(vals.length<=period)return NaN;let g=0,l=0;for(let i=vals.length-period;i<vals.length;i++){let d=vals[i]-vals[i-1];if(d>0)g+=d;else l-=d}if(l===0)return 100;return 100-100/(1+(g/period)/(l/period))}
+function atr(cs,period=14){if(cs.length<period+1)return NaN;let ts=[];for(let i=1;i<cs.length;i++)ts.push(Math.max(cs[i].h-cs[i].l,Math.abs(cs[i].h-cs[i-1].c),Math.abs(cs[i].l-cs[i-1].c)));return ts.slice(-period).reduce((a,b)=>a+b,0)/period}
+function analyze(){
+ if(!candles.length||!price)return;const closes=candles.map(x=>x.c),e9=ema(closes,9),e21=ema(closes,21),e50=ema(closes,50),rv=rsi(closes),av=atr(candles);
+ let s=0,reasons=[];
+ if(e9>e21){s++;reasons.push('EMA9 بالاتر از EMA21');}else{s--;reasons.push('EMA9 پایین‌تر از EMA21');}
+ if(e21>e50)s+=0.7;else s-=0.7;
+ if(rv>55){s+=0.7;reasons.push('RSI يميل للصعود');}else if(rv<45){s-=0.7;reasons.push('RSI يميل للهبوط');}else reasons.push('RSI محايد');
+ const last=candles[candles.length-1],prev=candles[candles.length-2];
+ if(last.c>last.o)s+=0.25;else if(last.c<last.o)s-=0.25;
+ const score=Math.min(99,Math.round(Math.abs(s)/2.65*100));
+ let sig='عدم ورود',cls='yellow';
+ if(s>=1.35){sig='شراء محتمل';cls='green'}else if(s<=-1.35){sig='نزولي — تجنّب الشراء';cls='red'}
+ analysis={s,score,sig,cls,e9,e21,e50,rv,av,reasons,last:prev?.c||last.o};
+}
+function render(){
+ $('price').textContent=money(price);const prev=candles.at(-2)?.c;let pct=prev?(price-prev)/prev*100:0;
+ $('change').textContent=prev?`تغير عن إغلاق الشمعة السابقة: ${pct>=0?'+':''}${pct.toFixed(2)}%`:'—';
+ if(analysis){$('signal').textContent=analysis.sig;$('signal').className='signal '+analysis.cls;$('reason').textContent=analysis.reasons.join(' • ');$('score').textContent=analysis.score+' / 100 (قوة القواعد، ليست نسبة نجاح)';$('strength').style.width=analysis.score+'%';$('ema').textContent=analysis.e9>analysis.e21?'EMA9 أعلى من EMA21':'EMA9 أقل من EMA21';$('rsi').textContent=analysis.rv.toFixed(1);$('atr').textContent=money(analysis.av);$('stop').textContent=money(price-analysis.av*1.5);$('target').textContent=money(price+analysis.av*2);}
+ updatePortfolio();
+}
+function equity(){return cash+positions.reduce((s,p)=>s+p.qty*price,0)}
+function updatePortfolio(){
+ const up=positions.reduce((s,p)=>s+(p.side==='BUY'?(price-p.entry)*p.qty:(p.entry-price)*p.qty),0);
+ $('cash').textContent=money(cash);$('equity').textContent=money(cash+up+positions.reduce((s,p)=>s+p.qty*p.entry,0)-positions.reduce((s,p)=>s+p.qty*p.entry,0));$('positions').textContent=money(positions.reduce((s,p)=>s+p.margin,0));$('upnl').textContent=money(up);$('closed').textContent=closed;
+ $('openPositions').innerHTML=positions.length?positions.map(p=>`<div class="row"><span>${p.side==='BUY'?'شراء':'بيع'} ${p.symbol} • هامش ${money(p.margin)} • دخول ${money(p.entry)}</span><b>${money(p.side==='BUY'?(price-p.entry)*p.qty:(p.entry-price)*p.qty)}</b></div>`).join(''):'لا توجد مراكز مفتوحة.';
+}
+function addLog(action,sym,px,result){logs.unshift({t:time(),action,sym,px,result});$('log').innerHTML=logs.slice(0,30).map(x=>`<tr><td>${x.t}</td><td>${x.action}</td><td>${x.sym}</td><td>${money(x.px)}</td><td>${x.result}</td></tr>`).join('')}
+function open(side){
+ if(!price)return;let margin=Number($('amount').value),sym=$('symbol').value;
+ if(!Number.isFinite(margin)||margin<5||margin>cash){$('tradeMsg').textContent='المبلغ غير صالح أو الرصيد غير كافٍ.';return}
+ // spot-like paper simulation; sell means bearish simulated position, not actual shorting
+ cash-=margin;const qty=margin/price;positions.push({side,symbol:sym,entry:price,qty,margin,stop:analysis?.av?price+(side==='BUY'?-1.5:1.5)*analysis.av:0,target:analysis?.av?price+(side==='BUY'?2:-2)*analysis.av:0});
+ $('tradeMsg').textContent='تم فتح مركز افتراضي فقط؛ لم يتم إرسال أمر إلى Binance.';addLog(side==='BUY'?'شراء دمو':'بيع دمو',sym,price,'مفتوح');updatePortfolio();
+}
+function closeAll(){
+ if(!positions.length){$('tradeMsg').textContent='لا توجد مراكز لإغلاقها.';return}
+ for(const p of positions){let pnl=(p.side==='BUY'?(price-p.entry):(p.entry-price))*p.qty;cash+=p.margin+pnl;closed++;addLog('إغلاق دمو',p.symbol,price,money(pnl))}
+ positions=[];$('tradeMsg').textContent='تم إغلاق المراكز الافتراضية.';updatePortfolio();
+}
+$('buy').onclick=()=>open('BUY');$('sell').onclick=()=>open('SELL');$('close').onclick=closeAll;
+$('reset').onclick=()=>{cash=100;positions=[];closed=0;logs=[];$('log').innerHTML='';$('tradeMsg').textContent='تمت إعادة حساب الدمو إلى 100 دولار افتراضي.';render()};
+$('clearLog').onclick=()=>{logs=[];$('log').innerHTML=''};
+$('symbol').onchange=fetchData;$('interval').onchange=fetchData;
+setInterval(()=>{tick--;if(tick<=0){tick=60;fetchData()}$('countdown').textContent=tick+' ث';},1000);
+fetchData();
+</script></body></html>
