@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>Crypto AI Scanner</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#141f31;--line:#26354b;--muted:#9aabc2;--text:#f3f6fb;--blue:#3987f6;--green:#25c79a;--red:#ff6678;--yellow:#f3c969}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:14px 14px calc(24px + env(safe-area-inset-bottom));max-width:620px;margin-inline:auto}
+header{display:flex;align-items:center;gap:10px;margin:8px 0 18px}.logo{width:44px;height:44px;border-radius:14px;background:#1c3556;display:grid;place-items:center;font-size:23px}h1{font-size:18px;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}.label{color:var(--muted);font-size:12px;margin-bottom:8px}label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px}select,button{font:inherit;width:100%;border-radius:12px;padding:13px;border:1px solid var(--line);background:#0d1727;color:var(--text)}button{border:0;background:var(--blue);font-weight:700;margin-top:12px;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.row{display:flex;gap:10px}.row>*{flex:1}.price{font-size:27px;font-weight:750;direction:ltr;text-align:right;margin:3px 0}.muted{color:var(--muted);font-size:12px;line-height:1.7}.timer{font-size:34px;font-weight:800;text-align:center;margin:10px 0;direction:ltr}.track{height:7px;background:#26354b;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;background:var(--green);transition:width .3s}.signal{font-size:22px;font-weight:800;margin:4px 0 8px}.signal.buy{color:var(--green)}.signal.sell{color:var(--red)}.signal.hold{color:var(--yellow)}.pill{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:4px 9px;font-size:11px;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:#0d1727;border-radius:12px;padding:12px}.stat b{display:block;font-size:16px;margin-top:5px}.hidden{display:none}.warning{border-right:3px solid var(--yellow);padding-right:10px}.smallbtn{background:#22334c;margin-top:8px}.footer{text-align:center;color:var(--muted);font-size:11px;margin:18px 4px}
+</style>
+</head>
+<body>
+<header><div class="logo">📈</div><div><h1>Crypto AI Scanner</h1><p>تحلیل بازار · سیگنال احتمالی · بدون اجرای معامله</p></div><span class="pill" style="margin-right:auto">نسخه آزمایشی</span></header>
+<section class="panel">
+  <div class="row">
+    <div><label for="market">منبع داده</label><select id="market"><option value="binance">Binance Spot · داده زنده</option><option value="mt5">MetaTrader 5 · نیازمند اتصال</option></select></div>
+    <div><label for="symbol">نماد</label><select id="symbol"><option value="BTCUSDT">BTC / USDT</option><option value="ETHUSDT">ETH / USDT</option><option value="BNBUSDT">BNB / USDT</option><option value="SOLUSDT">SOL / USDT</option><option value="XRPUSDT">XRP / USDT</option><option value="DOGEUSDT">DOGE / USDT</option></select></div>
+  </div>
+  <div class="muted" id="sourceNote" style="margin-top:10px">داده‌های عمومی Binance؛ بدون کلید API و بدون امکان ثبت سفارش.</div>
+  <button id="start">شروع تحلیل ۶۰ ثانیه‌ای</button>
+</section>
+<section class="panel">
+  <div class="label">قیمت آخرین دریافت</div><div id="price" class="price">—</div><div class="muted" id="updated">هنوز داده‌ای دریافت نشده</div>
+  <div style="margin-top:16px" class="label">پیشرفت تحلیل</div><div class="timer" id="timer">01:00</div><div class="track"><div class="bar" id="bar"></div></div>
+</section>
+<section class="panel">
+  <div class="label">نتیجهٔ تحلیل</div><div id="signal" class="signal hold">آمادهٔ شروع</div><div id="summary" class="muted">برای جمع‌آوری داده و محاسبهٔ شاخص‌ها، شروع تحلیل را بزنید.</div>
+  <div class="stats" style="margin-top:14px">
+    <div class="stat"><span class="muted">RSI (۱۴)</span><b id="rsi">—</b></div>
+    <div class="stat"><span class="muted">EMA ۹ / ۲۱</span><b id="ema">—</b></div>
+    <div class="stat"><span class="muted">تغییر قیمت طی تحلیل</span><b id="change">—</b></div>
+    <div class="stat"><span class="muted">نمونه‌های دریافت‌شده</span><b id="samples">0</b></div>
+  </div>
+</section>
+<section class="panel warning">
+  <b>مهم</b><div class="muted">این نسخه یک نمونهٔ اولیه با قواعد تکنیکال ساده است؛ «هوش مصنوعی» آموزش‌دیده یا تضمین سود نیست. تایمر فقط بازهٔ جمع‌آوری داده است. نتیجه را قبل از استفاده واقعی با بک‌تست و حساب دمو بررسی کنید.</div>
+</section>
+<div class="footer">فقط تحلیل و آموزش · هیچ سفارشی ثبت نمی‌شود · سیگنال‌ها توصیه مالی نیستند</div>
+<script>
+const $=id=>document.getElementById(id);
+const tg=window.Telegram?.WebApp;
+try{tg?.ready();tg?.expand();}catch(e){}
+let running=false, samples=[], timerId=null, fetchId=null, startPrice=null, lastPrice=null;
+const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:n<1?6:2});
+function setSignal(kind,title,desc){$('signal').className='signal '+kind;$('signal').textContent=title;$('summary').textContent=desc;}
+$('market').addEventListener('change',()=>{
+ const mt5=$('market').value==='mt5';
+ $('symbol').disabled=mt5;
+ $('sourceNote').textContent=mt5?'اتصال مستقیم به MT5 از صفحهٔ وب ممکن نیست. برای فعال‌سازی باید سرور واسط به ترمینال MT5 متصل شود.':'داده‌های عمومی Binance؛ بدون کلید API و بدون امکان ثبت سفارش.';
+ $('start').disabled=mt5;
+ if(mt5)setSignal('hold','MT5 متصل نیست','این گزینه فعلاً غیرفعال است؛ ابتدا باید ترمینال MT5 و سرویس واسط راه‌اندازی شوند.');
+ else setSignal('hold','آمادهٔ شروع','برای جمع‌آوری داده و محاسبهٔ شاخص‌ها، شروع تحلیل را بزنید.');
+});
+async function getKlines(){
+ const symbol=$('symbol').value;
+ const url=`https://data-api.binance.vision/api/v3/klines?symbol=${symbol}&interval=1m&limit=100`;
+ const res=await fetch(url,{cache:'no-store'});
+ if(!res.ok)throw new Error('پاسخ API ناموفق بود ('+res.status+')');
+ const data=await res.json();
+ if(!Array.isArray(data)||data.length<25)throw new Error('دادهٔ کافی دریافت نشد');
+ return data.map(k=>({time:k[0],open:+k[1],high:+k[2],low:+k[3],close:+k[4],volume:+k[5]}));
+}
+function ema(values,period){let k=2/(period+1),v=values.slice(0,period).reduce((a,b)=>a+b,0)/period;for(let i=period;i<values.length;i++)v=values[i]*k+v*(1-k);return v;}
+function rsi(values,period=14){let gains=0,losses=0;for(let i=values.length-period;i<values.length;i++){let d=values[i]-values[i-1];if(d>0)gains+=d;else losses-=d;}if(losses===0)return 100;return 100-(100/(1+(gains/period)/(losses/period)));}
+function analyze(){
+ const kl=samples[samples.length-1].klines, closes=kl.map(k=>k.close), r=rsi(closes), e9=ema(closes,9),e21=ema(closes,21);
+ const first=samples[0].price,last=samples[samples.length-1].price,change=(last-first)/first*100;
+ $('rsi').textContent=r.toFixed(1);$('ema').textContent=(e9>e21?'صعودی':'نزولی');$('change').textContent=(change>=0?'+':'')+change.toFixed(3)+'%';
+ $('samples').textContent=String(samples.length);
+ let score=0, reasons=[];
+ if(e9>e21){score++;reasons.push('EMA۹ بالاتر از EMA۲۱');}else{score--;reasons.push('EMA۹ پایین‌تر از EMA۲۱');}
+ if(r>=55){score++;reasons.push('RSI بالاتر از ۵۵');}else if(r<=45){score--;reasons.push('RSI پایین‌تر از ۴۵');}else reasons.push('RSI در محدودهٔ میانی');
+ if(change>0.08){score++;reasons.push('تغییر مثبت طی بازه');}else if(change< -0.08){score--;reasons.push('تغییر منفی طی بازه');}
+ if(score>=2)setSignal('buy','BUY · احتمال صعودی',reasons.join('؛ ')+'. سیگنال آزمایشی است و باید با بک‌تست ارزیابی شود.');
+ else if(score<=-2)setSignal('sell','SELL · احتمال نزولی',reasons.join('؛ ')+'. سیگنال آزمایشی است و باید با بک‌تست ارزیابی شود.');
+ else setSignal('hold','HOLD · عدم ورود',reasons.join('؛ ')+'. شواهد شاخص‌ها برای سیگنال هم‌جهت کافی نیست.');
+}
+async function sample(){
+ const klines=await getKlines(), price=klines[klines.length-1].close;
+ samples.push({at:Date.now(),price,klines});lastPrice=price;if(startPrice===null)startPrice=price;
+ $('price').textContent=fmt(price)+' USDT';$('updated').textContent='آخرین دریافت: '+new Date().toLocaleTimeString('fa-IR');
+ $('samples').textContent=String(samples.length);
+}
+function stop(){running=false;clearInterval(timerId);clearInterval(fetchId);$('start').disabled=false;}
+$('start').addEventListener('click',async()=>{
+ if(running)return;running=true;samples=[];startPrice=null;lastPrice=null;
+ $('start').disabled=true;$('rsi').textContent='—';$('ema').textContent='—';$('change').textContent='—';$('samples').textContent='0';$('bar').style.width='0%';$('timer').textContent='01:00';
+ setSignal('hold','در حال جمع‌آوری داده…','داده‌های کندل یک‌دقیقه‌ای از Binance دریافت می‌شوند. ممکن است در زمان‌های کوتاه چند نمونه، کندل یکسانی داشته باشند.');
+ const began=Date.now();
+ try{await sample();}catch(e){stop();setSignal('hold','دریافت داده ناموفق',e.message+'؛ اتصال اینترنت یا دسترسی API را بررسی کنید.');return;}
+ fetchId=setInterval(async()=>{if(!running)return;try{await sample();}catch(e){$('updated').textContent='خطای دریافت: '+e.message;}},10000);
+ timerId=setInterval(()=>{
+  const elapsed=Math.floor((Date.now()-began)/1000),left=Math.max(0,60-elapsed);
+  $('timer').textContent='00:'+String(left).padStart(2,'0');$('bar').style.width=Math.min(100,elapsed/60*100)+'%';
+  if(left===0){stop();try{analyze();}catch(e){setSignal('hold','تحلیل کامل نشد',e.message);}}
+ },250);
+});
+</script>
+</body></html>
